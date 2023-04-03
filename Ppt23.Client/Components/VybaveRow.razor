@@ -1,0 +1,119 @@
+﻿@using Ppt23.Shared
+@using Microsoft.AspNetCore.Components.Forms
+@using System.ComponentModel.DataAnnotations
+
+
+<head>
+	<meta charset="utf-8" />
+</head>
+
+
+@if (Vyb == null) return;
+
+@{
+    if (Vyb == null && IsInEditMode)
+        TurnOnEdit();
+ }
+
+<div class=" p-6 grid grid-cols-5">
+
+    @if (Vyb != null && !IsInEditMode)
+    {
+        <div class="@((Vyb.IsRevisionNeeded) ? "bg-red-200" : "")">@Vyb.Name</div>
+        <div class="@((Vyb.IsRevisionNeeded) ? "bg-red-200" : "")">@Vyb.Price</div>
+        <div class="@((Vyb.IsRevisionNeeded) ? "bg-red-200" : "")">@Vyb.BoughtDateTime.ToShortDateString() </div>
+        <div class="@((Vyb.IsRevisionNeeded) ? "bg-red-200" : "")">@Vyb.LastRevisionDateTime.ToShortDateString()
+                                                                   @(Vyb.IsRevisionNeeded ? "❌" : "✅") </div>
+        <div>
+
+            <button class="mx-2 my-1 rounded-md bg-red-400" @onclick="() => SmazEventCallBack.InvokeAsync() ">Smazat</button>
+            <button class="mx-2 my-1 rounded-md bg-teal-500" @onclick="() => Zreviduj.InvokeAsync()">Provést revizi</button>
+            <button class="border-[1px] border-amber-600 rounded-sm text-sm px-2 py-1" @onclick="() => TurnOnEdit() ">✏️</button>
+        </div>
+    }
+    else if (editingItem != null && IsInEditMode)
+    {
+    
+<EditForm class="col-span-5" Model=editingItem OnInvalidSubmit="() => TurnOffEdit(true)">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="p-6 grid grid-cols-5 @((editingItem.IsRevisionNeeded) ? "bg-red-200" : "")">
+        <div>
+            <InputText @bind-Value="@editingItem.Name" />
+        </div>
+
+        <div>
+            <InputNumber @bind-Value="editingItem.Price" />
+        </div>
+
+        <div><InputDate @bind-Value="@editingItem.BoughtDateTime" /></div>
+        <div><InputDate @bind-Value="@editingItem.LastRevisionDateTime" />@(editingItem.IsRevisionNeeded ? "❌" : "✅")</div>
+        @if (ChildContent == null)
+        {
+            <div>
+                <button type="submit" @onclick="() => TurnOffEdit(true)">✅</button>
+                <button type="button" @onclick="() => TurnOffEdit(false)">❌</button>
+            </div>
+
+        }
+        else
+        {
+            @ChildContent
+        }
+
+    </div>
+</EditForm>
+    }
+    else
+        {
+            <div>Smthings wrong ❌</div>
+        }
+
+</div>
+    @code {
+
+        [Parameter] public EventCallback<VybaveniVm> SmazEventCallBack { get; set; }
+        [Parameter] public EventCallback<VybaveniVm> Zreviduj { get; set; }
+        [Parameter] public EventCallback EditDoneCallback { get; set; }
+        [Parameter] public bool IsInEditMode { get; set; }
+        [Parameter] public RenderFragment? ChildContent { get; set; }
+
+        VybaveniVm? editingItem;
+        VybaveniVm? _Item;
+
+        [Parameter]
+        public VybaveniVm? Vyb
+        {
+            get => _Item;
+            set
+            {
+                _Item = value;
+                if (value != null && IsInEditMode)
+                    TurnOnEdit();
+            }
+        }
+
+        private void TurnOnEdit()
+        {
+            if (Vyb != null)
+            {
+                IsInEditMode = true;
+                editingItem = Vyb.Copy();
+            }
+        }
+
+        private void TurnOffEdit(bool success)
+        {
+            if (success)
+            {
+                editingItem?.MapTo(Vyb);
+            }
+            if (Vyb is not null)
+            {
+                IsInEditMode = false;
+                editingItem = null;
+                EditDoneCallback.InvokeAsync(success);
+            }
+        }
+    }
+

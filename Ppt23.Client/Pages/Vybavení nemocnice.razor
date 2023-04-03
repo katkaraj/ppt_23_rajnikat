@@ -1,0 +1,155 @@
+﻿@page "/vybaveni_nemocnice"
+@inject HttpClient Http
+@using System.Collections.Generic
+@using Ppt23.Shared
+@using Ppt23.Client.Components
+
+@if (seznamvybaveni is null)
+ {
+    <div class="absolute right-1/2 bottom-1/2  transform translate-x-1/2 translate-y-1/2 ">
+        <div>Načítám</div>
+        <div class=" border-t-transparent border-solid animate-spin  rounded-full border-teal-600 border-8 h-16 w-16"></div>
+    </div>
+    return;
+ }
+
+<head>
+    <meta charset="utf-8" />
+</head>
+
+<body>
+
+    <div class="p-8">
+        Vybavení nemocnice  <button class=" twtbn p-2 pl-5 pr-5 bg-teal-500 text-gray-100 rounded-lg text-sm focus:border-4 border-blue-300" @onclick="() => Pridejvybaveni()">Zobrazit vybavení</button>
+        <button class="p-2 pl-5 pr-5 bg-teal-600 text-gray-100 rounded-lg text-sm focus:border-4 border-blue-300" @onclick="() => { newModel = new(); isInNewMode = true;}">Nový kus</button>
+    </div>
+    <div>
+
+    </div>
+    <div class="p-6 grid grid-cols-5">
+        <div class="h-full w-full font-bold">Název</div>
+        <div class="h-full w-full font-bolf">Cena</div>
+        <div class="h-full w-full font-bold">Datum nákupu</div>
+        <div class="h-full w-full font-bold">Datum poslední revize</div>
+        <div></div>
+    </div>
+
+    @if (isInNewMode)
+    {
+        ArgumentNullException.ThrowIfNull(newModel);
+        <VybaveRow IsInEditMode=true
+                   Vyb="newModel"
+                   EditDoneCallback="async() => { await VytvorVybaveni(newModel); isInNewMode = false; }">
+            <div>
+                <button type="submit" class="mx-2 my-1 rounded-md bg-teal-500">Přidej</button>
+                <button type="button" class="mx-2 my-1 rounded-md bg-red-500" @onclick="() => isInNewMode= false">Zrušit</button>
+            </div>
+        </VybaveRow>
+    }
+    @foreach (VybaveniVm Vyb in seznamvybaveni)
+    {
+        <VybaveRow Vyb="Vyb"
+                   SmazEventCallBack="() => DeleteVybaveni(Vyb)"
+                   Zreviduj="() => Revizevybaveni(Vyb)"
+                   EditDoneCallback="async(editVyb) => await Editvybaveni(editVyb)">
+                  
+        </VybaveRow>        
+    }
+</body>
+
+@code{
+
+    private List<VybaveniVm>? seznamvybaveni; //= new List<VybaveniVm>();
+    VybaveniVm? newModel;
+    bool isInNewMode;
+
+    //GET
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(1000);
+        seznamvybaveni = await Http.GetFromJsonAsync<List<VybaveniVm>>("vybaveni_nemocnice");
+    }
+
+
+    //DELETE
+    protected async Task DeleteVybaveni(VybaveniVm vyb)
+    {
+        var odpoved = await Http.DeleteAsync($"vybaveni_nemocnice/{vyb.Id}");
+        if (odpoved.IsSuccessStatusCode)
+            seznamvybaveni?.Remove(vyb);
+    }
+
+    //Přidá nové vybavení - POST
+    protected async Task VytvorVybaveni(VybaveniVm vyb)
+    {
+        HttpResponseMessage odpoved = await Http.PostAsJsonAsync<VybaveniVm>($"vybaveni_nemocnice", vyb);
+        if (odpoved.IsSuccessStatusCode)
+        {
+            VybaveniVm? newvyb = await odpoved.Content.ReadFromJsonAsync<VybaveniVm>();
+            if(newvyb != null)
+            {
+                vyb.Id = newvyb.Id;
+                seznamvybaveni?.Insert(0, vyb);
+            }
+        }
+        else
+        {
+            Console.WriteLine("Obnovte stránku");
+        }
+    }
+
+    //Upraví vybavení v listu podle Id - PUT
+    protected async Task Editvybaveni(object editVyb)
+    {
+        var vyb = editVyb as VybaveniVm;
+        if(vyb != null)
+        {
+            var odpoved = await Http.PutAsJsonAsync($"vybaveni_nemocnice/{vyb.Id}", vyb);
+        }
+
+        //HttpResponseMessage odpoved = await Http.PutAsJsonAsync($"vybaveni_nemocnice/{editVyb.Id}", editVyb);
+        //if (odpoved.IsSuccessStatusCode)
+        //{
+        //  Console.WriteLine("Vybavení bylo upraveno");
+        //}
+        //else
+        //{
+        //  Console.WriteLine("Obnovte stránku");
+        //}
+    }
+
+    protected async Task Pridejvybaveni()
+    {
+        seznamvybaveni = await Http.GetFromJsonAsync<List<VybaveniVm>>("vybaveni_nemocnice");
+    }
+
+    //public void AddItem()
+    //{
+    //    seznamvybaveni.Add(new VybaveniVm());
+    //
+    //}
+
+    public async Task Revizevybaveni(VybaveniVm vyb)
+    {
+        var odpoved = await Http.PutAsync($"vybaveni_nemocnice/revize/{vyb.Id}", null);
+    if (odpoved.IsSuccessStatusCode)
+        {
+            vyb.LastRevisionDateTime = DateTime.Today;
+        }
+    }
+
+    //private void Revize(VybaveniVm vybaveni)
+    //{
+     //   vybaveni.LastRevisionDateTime = DateTime.Today;
+    //}
+
+    //public Vybavení_nemocnice()
+    //{
+    //    for (int i = 0; i < 4; i++)
+    //    {
+    //        seznamvybaveni.Add(new VybaveniVm());
+    //    }
+    //}
+}
+
+
