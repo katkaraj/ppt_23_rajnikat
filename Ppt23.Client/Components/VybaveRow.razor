@@ -72,48 +72,50 @@
 </div>
     @code {
 
-        [Parameter] public EventCallback<VybaveniVm> SmazEventCallBack { get; set; }
-        [Parameter] public EventCallback<VybaveniVm> Zreviduj { get; set; }
-        [Parameter] public EventCallback EditDoneCallback { get; set; }
-        [Parameter] public bool IsInEditMode { get; set; }
-        [Parameter] public RenderFragment? ChildContent { get; set; }
+            [Parameter] public EventCallback<VybaveniVm> SmazEventCallBack { get; set; }
+            [Parameter] public EventCallback<VybaveniVm> Zreviduj { get; set; }
+            [Parameter] public EventCallback EditDoneCallback { get; set; }
+            [Parameter] public bool IsInEditMode { get; set; }
+            [Parameter] public RenderFragment? ChildContent { get; set; }
 
-        VybaveniVm? editingItem;
-        VybaveniVm? _Item;
+            VybaveniVm? editingItem;
+            VybaveniVm? _Item;
 
-        [Parameter]
-        public VybaveniVm? Vyb
+            [Parameter]
+            public VybaveniVm? Vyb
         {
-            get => _Item;
-            set
+                get => _Item;
+                set
             {
-                _Item = value;
-                if (value != null && IsInEditMode)
-                    TurnOnEdit();
+                    _Item = value;
+                    if (value != null && IsInEditMode)
+                        TurnOnEdit();
+                }
             }
-        }
 
-        private void TurnOnEdit()
-        {
-            if (Vyb != null)
+            private void TurnOnEdit()
             {
-                IsInEditMode = true;
-                editingItem = Vyb.Copy();
+                if (Vyb != null)
+                {
+                    IsInEditMode = true;
+                    editingItem = Vyb.Copy();
+                }
             }
-        }
 
-        private void TurnOffEdit(bool success)
-        {
-            if (success)
+            private async Task TurnOffEdit(bool success)
             {
-                editingItem?.MapTo(Vyb);
-            }
-            if (Vyb is not null)
-            {
-                IsInEditMode = false;
+                if (success)
+                {
+                    editingItem?.MapTo(Vyb);
+                }
+                if (Vyb is not null)
+                {
+                    IsInEditMode = false;
+                }
+
                 editingItem = null;
-                EditDoneCallback.InvokeAsync(success);
+                await EditDoneCallback.InvokeAsync(Vyb);
+
             }
         }
-    }
 

@@ -36,11 +36,13 @@ app.MapGet("/vybaveni_nemocnice", () =>
 });//.WithOpenApi();
 
 
-//Přidá nové vybavení do listu
+//Přidá=POST nové vybavení do listu 
 app.MapPost("/vybaveni_nemocnice", (VybaveniVm prichoziModel) =>
 {
-    prichoziModel.Id = Guid.NewGuid();
+    Guid newId = Guid.NewGuid();
+    prichoziModel.Id = newId;
     seznamVybaveni.Insert(0, prichoziModel);
+    return Results.Ok(prichoziModel);
 });
 
 //Smaže vybavení podle Id
@@ -53,7 +55,7 @@ app.MapDelete("/vybaveni_nemocnice/{Id}", (Guid Id) =>
     return Results.Ok();
 });
 
-//Upraví vybavení v listu (podle Id)
+//Upraví=PUT vybavení v listu (podle Id)
 app.MapPut("/vybaveni_nemocnice/{Id}", (Guid Id, VybaveniVm vyb) =>
 {
     var item = seznamVybaveni.SingleOrDefault(x => x.Id == Id);
@@ -80,6 +82,7 @@ app.MapGet("/vybaveni_nemocnice/{Id}", (Guid Id) =>
 
 });
 
+//revize vybavení - PUT
 app.MapPut("/vybaveni_nemocnice/revize/{Id}", (Guid Id) =>
 {
     var item = seznamVybaveni.SingleOrDefault(x => x.Id == Id);
@@ -93,7 +96,6 @@ app.MapPut("/vybaveni_nemocnice/revize/{Id}", (Guid Id) =>
         return Results.Ok();
     }
 });
-
 
 app.Run();
 
