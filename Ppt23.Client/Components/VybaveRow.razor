@@ -19,7 +19,7 @@
 
     @if (Vyb != null && !IsInEditMode)
     {
-        <div class="@((Vyb.IsRevisionNeeded) ? "bg-red-200" : "")">@Vyb.Name</div>
+        <div class="@((Vyb.IsRevisionNeeded) ? "bg-red-200" : "")"><a href="vybaveni_nemocnice/{@Vyb.Id}" >@Vyb.Name</a></div>
         <div class="@((Vyb.IsRevisionNeeded) ? "bg-red-200" : "")">@Vyb.Price</div>
         <div class="@((Vyb.IsRevisionNeeded) ? "bg-red-200" : "")">@Vyb.BoughtDateTime.ToShortDateString() </div>
         <div class="@((Vyb.IsRevisionNeeded) ? "bg-red-200" : "")">@Vyb.LastRevisionDateTime.ToShortDateString()

@@ -1,15 +1,18 @@
-﻿@page "/vybaveni/{Id:guid}"
+﻿@page "/vybaveni_nemocnice/{Id:guid}"
 @inject HttpClient Http
 @using Ppt23.Shared
 
-<h3>VybaveniDetail @Id</h3>
+@if(vybaveni == null)
+    { return; }
 
-<div class="grid grid-cols-2">
-    <div>Id: @vybaveni?.Id</div>
-    <div>Název: @vybaveni?.Name</div>
-    <div>Cena: @vybaveni?.Price</div>
-    <div>Datum nákupu: @vybaveni?.BoughtDateTime</div>
-    <div>Poslední revize: @vybaveni?.LastRevisionDateTime</div>
+<h3>VybaveniDetail</h3>
+
+<div class="grid grid-cols-1">
+    <div>Id: @vybaveni.Id</div>
+    <div>Název: @vybaveni.Name</div>
+    <div>Cena: @vybaveni.Price</div>
+    <div>Datum nákupu: @vybaveni.BoughtDateTime</div>
+    <div>Poslední revize: @vybaveni.LastRevisionDateTime</div>
 </div>
 
 
@@ -20,7 +23,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var vyb = await Http.GetFromJsonAsync<VybaveniVm>($"vybaveni/{Id}");
+        await Task.Delay(500);
+        vybaveni = await Http.GetFromJsonAsync<VybaveniVm>($"vybaveni_nemocnice/{Id}");
     }
     
 }
