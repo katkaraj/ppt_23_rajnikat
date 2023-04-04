@@ -59,7 +59,7 @@
 
 @code{
 
-    private List<VybaveniVm>? seznamvybaveni; //= new List<VybaveniVm>();
+    List<VybaveniVm>? seznamvybaveni; //= new List<VybaveniVm>();
     VybaveniVm? newModel;
     bool isInNewMode;
 
@@ -85,12 +85,14 @@
         HttpResponseMessage odpoved = await Http.PostAsJsonAsync<VybaveniVm>($"vybaveni_nemocnice", vyb);
         if (odpoved.IsSuccessStatusCode)
         {
-            VybaveniVm? newvyb = await odpoved.Content.ReadFromJsonAsync<VybaveniVm>();
-            if(newvyb != null)
-            {
-                vyb.Id = newvyb.Id;
+           // VybaveniVm? newvyb = await odpoved.Content.ReadFromJsonAsync<VybaveniVm>();
+            //if(newvyb != null)
+           // {
+               // vyb.Id = newvyb.Id;
+                vyb.LastRevisionDateTime = DateTime.Today;
                 seznamvybaveni?.Insert(0, vyb);
-            }
+                isInNewMode = false;
+            //}
         }
         else
         {
@@ -120,7 +122,7 @@
 
     protected async Task Pridejvybaveni()
     {
-        seznamvybaveni = await Http.GetFromJsonAsync<List<VybaveniVm>>("vybaveni_nemocnice");
+        seznamvybaveni = await Http.GetFromJsonAsync<List<VybaveniVm>>($"vybaveni_nemocnice/pridani");
     }
 
     //public void AddItem()

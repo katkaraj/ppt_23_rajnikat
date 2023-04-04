@@ -35,6 +35,11 @@ app.MapGet("/vybaveni_nemocnice", () =>
 
 });//.WithOpenApi();
 
+app.MapGet("/vybaveni_nemocnice/pridani", () =>
+{
+    seznamVybaveni = VybaveniVm.GetTestList(4);
+    return seznamVybaveni;
+});
 
 //Přidá=POST nové vybavení do listu 
 app.MapPost("/vybaveni_nemocnice", (VybaveniVm prichoziModel) =>
