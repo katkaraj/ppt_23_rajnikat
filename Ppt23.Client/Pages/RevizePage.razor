@@ -1,0 +1,31 @@
+﻿@page "/revize/nazdar"
+@using Ppt23.Shared
+@inject HttpClient Http
+
+<h1 class="bg-green-500">@nazdar</h1>
+
+<div>
+    <input type="text" class="border" @bind-value="retezec"/>
+    <button @onclick="() => NajdiRevizi()">Najdi</button>
+    <div>
+        @foreach(var rev in seznamrevizi)
+            {
+                <div>Nazev: @rev.Nazev</div>
+            }
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter] public string nazdar { get; set; }
+    string retezec = "";
+    List<RevizeViewModel> seznamrevizi;
+
+    async Task NajdiRevizi()
+    {
+        seznamrevizi = await Http.GetFromJsonAsync<List<RevizeViewModel>>($"revize/nazdar");
+    }
+
+    }
+

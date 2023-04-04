@@ -101,3 +101,31 @@ public class VybaveniVm
     }
 
 }
+public class RevizeViewModel
+{
+    public string Nazev;
+    public Guid Id { get; set; }
+    Random rnd = new Random();
+
+    public static List<RevizeViewModel> GetRevizeList(int poc)
+    {
+        List<RevizeViewModel> list = new();
+        for (int i = 0; i < poc; i++)
+        {
+            RevizeViewModel model = new()
+            {
+                Nazev = RandomString(5),
+                Id = Guid.NewGuid()
+
+            };
+            list.Add(model);
+        }
+        return list;
+    }
+
+    public static string RandomString(int lenght)
+    {
+        const string chars = "abcdefghijklmnopqrstuvwxyz";
+        return new string(Enumerable.Repeat(chars, lenght).Select(s => s[rnd.Next(s.Length)]).ToArray());
+    }
+}

@@ -14,7 +14,7 @@ policy.WithOrigins("https://localhost:1111")
 .AllowAnyHeader()));
 
 var app = builder.Build();
-app.UseCors();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -24,9 +24,16 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors();
 
 List<VybaveniVm> seznamVybaveni = VybaveniVm.GetTestList(10);
+List<RevizeViewModel> seznamRevizi = RevizeViewModel.GetRevizeList(5);
+
+
+app.MapGet("/revize/nazdar", (string str) =>
+{
+    return seznamRevizi;
+});
 
 //Vrátí seznam vybavení
 app.MapGet("/vybaveni_nemocnice", () =>
