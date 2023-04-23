@@ -4,6 +4,5 @@
 
 ## Odkaz na stránku
 
-https://katkaraj.github.io/ppt23_rajnikat1/
-
+https://katkaraj.github.io/ppt_23_rajnikat/
 
