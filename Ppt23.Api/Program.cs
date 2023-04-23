@@ -30,9 +30,10 @@ List<VybaveniVm> seznamVybaveni = VybaveniVm.GetTestList(10);
 List<RevizeViewModel> seznamRevizi = RevizeViewModel.GetRevizeList(5);
 
 
-app.MapGet("/revize/nazdar", (string str) =>
+app.MapGet("/revize/{nazdar}", (string str) =>
 {
-    return seznamRevizi;
+    var filtrRevize = seznamRevizi.Where(x => x.Nazev.Contains(str)).ToList();
+    return Results.Ok(filtrRevize);
 });
 
 //Vrátí seznam vybavení

@@ -105,7 +105,7 @@ public class RevizeViewModel
 {
     public string Nazev;
     public Guid Id { get; set; }
-    Random rnd = new Random();
+    //Random rnd = new Random();
 
     public static List<RevizeViewModel> GetRevizeList(int poc)
     {
@@ -114,7 +114,7 @@ public class RevizeViewModel
         {
             RevizeViewModel model = new()
             {
-                Nazev = RandomString(5),
+                Nazev = RandomString(Random.Shared.Next(5, 25)),
                 Id = Guid.NewGuid()
 
             };
@@ -123,9 +123,7 @@ public class RevizeViewModel
         return list;
     }
 
-    public static string RandomString(int lenght)
-    {
-        const string chars = "abcdefghijklmnopqrstuvwxyz";
-        return new string(Enumerable.Repeat(chars, lenght).Select(s => s[rnd.Next(s.Length)]).ToArray());
-    }
+    public static string RandomString(int length)=>
+    
+        new(Enumerable.Range(0, length).Select(_ => (char)Random.Shared.Next('a', 'z')).ToArray()); 
 }
