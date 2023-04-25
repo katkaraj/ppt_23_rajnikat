@@ -23,7 +23,15 @@ jobs:
         with:
           dotnet-version: '7.x'
           include-prerelease: true
-
+          
+      - name: Determine latest folder # 01,02, atd - najde poslední cvičení
+        id: latest_folder
+        run: |
+          # Get a list of folders in the current directory sorted by name in reverse order
+          folders=$(ls -d */ | sort -r)
+          # Set the latest folder as an environment variable
+          latest_folder=${folders%%/*}
+          echo "LATEST_FOLDER=$latest_folder" >> $GITHUB_ENV
       - name: Publish with dotnet #do určené složky publikuje aplikace, v release configuraci
         run: dotnet publish  ${{ env.LATEST_FOLDER }}/Ppt23.Api/Ppt23.Api.csproj --configuration Release --output ${{env.PUBLISH_DIR}}
         # ☝️ Upravte dle názvu vašeho .sln
