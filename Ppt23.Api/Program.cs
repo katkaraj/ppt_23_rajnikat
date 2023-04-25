@@ -8,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var corsAllowedOrigin = builder.Configuration.GetSection("CorsAllowedOrigins").Get<string[]>();
+ArgumentNullException.ThrowIfNull(corsAllowedOrigin);
+
 builder.Services.AddCors(corsOptions => corsOptions.AddDefaultPolicy(policy =>
 policy.WithOrigins("https://localhost:1111")
 .WithMethods("GET", "DELETE", "POST", "PUT")
