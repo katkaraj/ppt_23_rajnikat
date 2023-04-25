@@ -1,5 +1,7 @@
 ﻿using Ppt23.Shared;
 using Microsoft.AspNetCore.Authentication.OAuth.Claims;
+using Microsoft.EntityFrameworkCore;
+using Ppt23.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<PptDbContext>(opt => opt.UseSqlite("FileName=mojeDatabaze.db"));
+
+var corsAllowedOrigin = builder.Configuration.GetSection("CorsAllowedOrigins").Get<string[]>();
+ArgumentNullException.ThrowIfNull(corsAllowedOrigin);
 
 builder.Services.AddCors(corsOptions => corsOptions.AddDefaultPolicy(policy =>
 policy.WithOrigins("https://localhost:1111")
@@ -37,11 +43,12 @@ app.MapGet("/revize/{nazdar}", (string str) =>
 });
 
 //Vrátí seznam vybavení
-app.MapGet("/vybaveni_nemocnice", () =>
+app.MapGet("/vybaveni_nemocnice", (PptDbContext db) =>
 {
+    Console.WriteLine(/*$"Pocet vybaveni v db: {db.Vybavenis.Count()}"*/);
     return seznamVybaveni;
 
-});//.WithOpenApi();
+});
 
 app.MapGet("/vybaveni_nemocnice/pridani", () =>
 {
@@ -50,7 +57,7 @@ app.MapGet("/vybaveni_nemocnice/pridani", () =>
 });
 
 //Přidá=POST nové vybavení do listu 
-app.MapPost("/vybaveni_nemocnice", (VybaveniVm prichoziModel) =>
+app.MapPost("/vybaveni_nemocnice", (VybaveniVm prichoziModel, PptDbContext db) =>
 {
     Guid newId = Guid.NewGuid();
     prichoziModel.Id = newId;
