@@ -28,7 +28,7 @@ jobs:
         run: dotnet build Ppt23.Api/Ppt23.Api.csproj --configuration Release
         
       - name: Publish with dotnet #do určené složky publikuje aplikace, v release configuraci
-        run: dotnet publish ppt_23_rajnikat/Ppt23.Api/Ppt23.Api.csproj --configuration Release --output ${{env.PUBLISH_DIR}}
+        run: dotnet publish Ppt23.Api/Ppt23.Api.csproj --configuration Release --output ${{env.PUBLISH_DIR}}
         # ☝️ Upravte dle názvu vašeho .sln
 
       - name: Upload artifact for deployment job
