@@ -1,3 +1,4 @@
-‹%€ï»¿{
-  "HttpClientBaseAddress": "https://ppt23-rajnikat.azurewebsites.net"
+‹1€ï»¿{
+  "CorsAllowedOrigins": [ "https://katkaraj.github.io" ],
+  "sqliteDbPath": "mojeDatabaze.db"
 }

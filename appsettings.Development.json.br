@@ -1,3 +1,4 @@
-‹€ï»¿{
-  "HttpClientBaseAddress": "https://localhost:2222"
+0€ï»¿{
+  "CorsAllowedOrigin": [ "https://localhost:1111" ],
+  "sqliteDbPath" :  "mojeDatabaze.db"
 }
