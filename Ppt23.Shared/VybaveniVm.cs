@@ -103,8 +103,9 @@ public class VybaveniVm
 }
 public class RevizeViewModel
 {
-    public string Nazev;
+    public string? Nazev;
     public Guid Id { get; set; }
+    public DateTime DateTime { get; set; }
     //Random rnd = new Random();
 
     public static List<RevizeViewModel> GetRevizeList(int poc)
@@ -126,4 +127,13 @@ public class RevizeViewModel
     public static string RandomString(int length)=>
     
         new(Enumerable.Range(0, length).Select(_ => (char)Random.Shared.Next('a', 'z')).ToArray()); 
+}
+
+public class VybaveniRevizeVm
+{
+    public Guid Id { get; set; }
+
+    public Guid RevizeId { get; set; }
+    public string? Name { get; set; }
+    public List<RevizeViewModel> Revizes { get; set; } = new List<RevizeViewModel>();
 }
