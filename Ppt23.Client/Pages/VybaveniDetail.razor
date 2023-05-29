@@ -1,41 +1,84 @@
 ﻿@page "/vybaveni_nemocnice/{Id:guid}"
 @inject HttpClient Http
 @using Ppt23.Shared
+@using Microsoft.AspNetCore.Components.Forms
 
-@if(vybaveni == null)
-    { return; }
 
-<h3 class="font-bold p-5">VybaveniDetail @vybaveni.Name</h3>
+@if (vybaveni == null)
+{
+    <div class="absolute right-1/2 bottom-1/2  transform translate-x-1/2 translate-y-1/2 ">
+        <div class=" border-t-transparent border-solid animate-spin  rounded-full border-teal-600 border-8 h-16 w-16"></div>
+    </div>
+    return;
+}
+<head> 
+    <title class="font-bold p-5">Detail vybavení: @vybaveni.Name</title>
+</head>
 
-<div class="grid grid-cols-2">
-    
+<body> 
+    <div class="grid grid-cols-2">
+
         <div>Id:</div>
         <div>@vybaveni.Id</div>
-    
+
         <div>Název:</div>
         <div>@vybaveni.Name</div>
-    
+
         <div>Cena:</div>
-        <div>@vybaveni.Price</div>  
-    
+        <div>@vybaveni.Price</div>
+
         <div>Datum nákupu:</div>
-        <div>@vybaveni.BoughtDateTime</div>   
-    
+        <div>@vybaveni.BoughtDateTime</div>
+
         <div>Poslední revize:</div>
         <div>@vybaveni.LastRevisionDateTime</div>
-    
-</div>
 
+        <div>Seznam revizí</div>
+        <div> </div>
+            @foreach (var o in VybRev.Revizes)
+            {
+                <div>Id:</div>
+                <div>@o.Id</div>
+
+                <div>Název:</div>
+                <div>@o.Nazev</div>
+
+                <div>Datum:</div>
+                <div>@o.DateTime</div>
+            }
+
+        <div>Seznam úkonů</div>
+        <div> </div>
+           @foreach (var o in VybRev.Ukons)
+            {
+                <div>Id:</div>
+                <div>@o.Id</div>
+
+                <div>Název:</div>
+                <div>@o.Name</div>
+
+                <div>Datum:</div>
+                <div>@o.Date</div>
+            }
+    </div>
+</body>
 
 @code{
 
     [Parameter] public Guid Id { get; set; }
     VybaveniVm? vybaveni;
+    VybaveniRevizeVm? VybRev;
+    VybaveniUkonVm? VybUk;
 
     protected override async Task OnInitializedAsync()
     {
-        await Task.Delay(500);
-        vybaveni = await Http.GetFromJsonAsync<VybaveniVm>($"vybaveni_nemocnice/{Id}");
+        await Task.Delay(100);
+        VybRev = await Http.GetFromJsonAsync<VybaveniRevizeVm>($"vybaveni_nemocnice/{Id}");
+        List<VybaveniVm>? vybaveniVm = await Http.GetFromJsonAsync<List<VybaveniVm>>("/vybaveni_nemocnice");
+       
+        vybaveni = vybaveniVm?.SingleOrDefault(x => x.Id == VybRev?.Id);
+        var odpoved = Http.PutAsJsonAsync($"vybaveni_nemocnice/{vybaveni.Id}", vybaveni);
+
     }
-    
+
 }

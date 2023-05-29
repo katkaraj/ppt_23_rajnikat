@@ -14,6 +14,7 @@ namespace Ppt23.Api.Data
 
         public DbSet<Vybaveni> Vybavenis => Set<Vybaveni>();
 		public DbSet<Revize> Revizes => Set<Revize>();
+		public DbSet<Ukon> Ukons => Set<Ukon>();
     }
 }
 

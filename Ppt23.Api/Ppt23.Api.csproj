@@ -32,5 +32,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Remove="Data\SeedingData.cs" />
+    <Content Remove="Data\Ukon.json" />
   </ItemGroup>
 </Project>

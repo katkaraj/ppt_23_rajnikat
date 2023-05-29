@@ -18,9 +18,13 @@ namespace Ppt23.Api.Data
             {
                 for (int i = 0; i < 5; i++)
                 {
-                    var en = new VybaveniVm();
-                    en.Id = Guid.Empty;
-                    db.Vybavenis.Add(en.Adapt<Vybaveni>());
+                    VybaveniVm vyb = new VybaveniVm();
+                    var en = vyb.Adapt<Vybaveni>();
+                    
+                    en.pridejRevizis(db);
+                    en.pridejUkons(db);
+                    db.Vybavenis.Add(en);
+                    
                 }
             }
 

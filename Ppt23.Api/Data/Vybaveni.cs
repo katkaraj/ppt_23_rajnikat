@@ -16,7 +16,9 @@ namespace Ppt23.Api.Data
         public DateTime LastRevisionDateTime { get; set; }
         public bool IsRevisionNeeded { get => LastRevisionDateTime < DateTime.Now.AddYears(-2); }
         public int Price { get; set; }
+
         public List<Revize> Revizes { get; set; } = new();
+        public List<Ukon> Ukons { get; set; } = new();
 
         public void pridejRevizis(PptDbContext db)
         {
@@ -39,6 +41,29 @@ namespace Ppt23.Api.Data
                 db.Revizes.Add(rev);
                 
             }
+        }
+
+        public void pridejUkons(PptDbContext db)
+        {
+            Random rnd = new Random();
+            string[] ukony = {"CT scan", "MRI", "Endoskopie", "UZ" };
+
+            for (int j = 0; j < rnd.Next(0, 2); j++)
+            {
+                Ukon ukon = new Ukon()
+                {
+                    Id = Guid.Empty,
+                    Name = ukony[rnd.Next(ukony.Length)],
+                    vybaveni = this,
+                    VybaveniId = Id
+
+                };
+            ukon.randDate(this.Adapt<VybaveniVm>(), this.BoughtDateTime, DateTime.Today);
+
+            Ukons.Add(ukon);
+            db.Ukons.Add(ukon);
+            }
+
         }
     }
 

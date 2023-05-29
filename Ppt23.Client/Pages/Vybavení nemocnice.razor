@@ -40,9 +40,9 @@
 
         <VybaveRow IsInEditMode=true
                    Vyb="newModel"
-                   EditDoneCallback="async() => { await VytvorVybaveni(newModel); isInNewMode = false; }">
+                   EditDoneCallback="async() => { await VytvorVybaveni(newModel); /*isInNewMode = false;*/ }">
             <div>
-                <button type="submit" class="mx-2 my-1 rounded-md bg-teal-500">Přidej</button>
+                <button type="submit" class="mx-2 my-1 rounded-md bg-teal-500">Ok</button>
                 <button type="button" class="mx-2 my-1 rounded-md bg-red-500" @onclick="() => isInNewMode= false">Zrušit</button>
             </div>
         </VybaveRow>
@@ -78,6 +78,7 @@
     //DELETE*
     protected async Task DeleteVybaveni(VybaveniVm vyb)
     {
+        
         var odpoved = await Http.DeleteAsync($"vybaveni_nemocnice/{vyb.Id}");
         if (odpoved.IsSuccessStatusCode && seznamvybaveni is not null)
             seznamvybaveni.Remove(vyb);
@@ -86,7 +87,8 @@
     //Přidá nové vybavení - POST*
     protected async Task VytvorVybaveni(VybaveniVm vyb)
     {
-        HttpResponseMessage odpoved = await Http.PostAsJsonAsync<VybaveniVm>($"vybaveni_nemocnice", vyb);
+        vyb.LastRevisionDateTime = DateTime.Now;
+        var odpoved = await Http.PostAsJsonAsync<VybaveniVm>($"vybaveni_nemocnice", vyb);
         if (odpoved.IsSuccessStatusCode)
         {
 

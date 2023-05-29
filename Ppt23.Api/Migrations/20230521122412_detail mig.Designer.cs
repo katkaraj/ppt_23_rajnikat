@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ppt23.Api.Data;
 
@@ -10,9 +11,11 @@ using Ppt23.Api.Data;
 namespace Ppt23.Api.Migrations
 {
     [DbContext(typeof(PptDbContext))]
-    partial class PptDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230521122412_detail mig")]
+    partial class detailmig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.4");
@@ -101,7 +104,7 @@ namespace Ppt23.Api.Migrations
             modelBuilder.Entity("Ppt23.Api.Data.Ukon", b =>
                 {
                     b.HasOne("Ppt23.Api.Data.Vybaveni", "vybaveni")
-                        .WithMany("Ukons")
+                        .WithMany()
                         .HasForeignKey("VybaveniId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -112,8 +115,6 @@ namespace Ppt23.Api.Migrations
             modelBuilder.Entity("Ppt23.Api.Data.Vybaveni", b =>
                 {
                     b.Navigation("Revizes");
-
-                    b.Navigation("Ukons");
                 });
 #pragma warning restore 612, 618
         }

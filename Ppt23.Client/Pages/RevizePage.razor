@@ -28,7 +28,7 @@
 
     async Task NajdiRevizi()
     {
-        seznamrevizi = await Http.GetFromJsonAsync<List<RevizeViewModel>>($"revize/{nazdar}");
+        seznamrevizi = await Http.GetFromJsonAsync<List<RevizeViewModel>>($"/revize/{nazdar}");
     }
 
     }

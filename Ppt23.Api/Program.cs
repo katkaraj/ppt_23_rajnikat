@@ -1,34 +1,42 @@
-﻿using Ppt23.Shared;
+﻿using Mapster;
+using Ppt23.Shared;
 using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Ppt23.Api.Data;
-using Mapster;
+
 
 var builder = WebApplication.CreateBuilder(args);
-var corsAllowedOrigin = builder.Configuration.GetSection("CorsAllowedOrigins").Get<string[]>();
-
-string sqliteDbPath = builder.Configuration.GetValue<string>("sqliteDbPath");
-//ArgumentNullException.ThrowIfNull(sqliteDbPath);
-if(string.IsNullOrEmpty(sqliteDbPath)) { throw new ArgumentException(nameof(sqliteDbPath)); }
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<PptDbContext>(opt => opt.UseSqlite($"FileName={sqliteDbPath}"));
 builder.Services.AddScoped<SeedingData>();
+
+var corsAllowedOrigin = builder.Configuration.GetSection("CorsAllowedOrigins").Get<string[]>();
+ArgumentNullException.ThrowIfNull(corsAllowedOrigin);
 
 builder.Services.AddCors(corsOptions => corsOptions.AddDefaultPolicy(policy =>
 policy.WithOrigins(corsAllowedOrigin)
 .WithMethods("GET", "DELETE", "POST", "PUT")
 .AllowAnyHeader()));
 
-var app = builder.Build();
-app.UseCors();
 
-app.Services.CreateScope().ServiceProvider
-  .GetRequiredService<PptDbContext>()
-  .Database.Migrate();
+string? sqliteDbPath = builder.Configuration[nameof(sqliteDbPath)];
+ArgumentNullException.ThrowIfNull(sqliteDbPath);
+//if(string.IsNullOrEmpty(sqliteDbPath)) { throw new ArgumentException(nameof(sqliteDbPath)); }
+builder.Services.AddDbContext<PptDbContext>(opt => opt.UseSqlite($"FileName={sqliteDbPath}"));
+
+var app = builder.Build();
+
+//app.Services.CreateScope().ServiceProvider
+  //.GetRequiredService<PptDbContext>()
+  //.Database.Migrate();
+
+app.UseCors();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -48,22 +56,51 @@ app.MapGet("/revize/{nazdar}", (string nazdar, PptDbContext db) =>
 {
     var list = db.Revizes.ToList();
     var filtrRevize = list.Where(x => x.Name.Contains(nazdar)).Adapt<List<RevizeViewModel>>();
+    db.SaveChanges();
     return Results.Ok();
 });
 
 //Vrátí seznam vybavení
 app.MapGet("/vybaveni_nemocnice", (PptDbContext db) =>
 {
-    Console.WriteLine($"Pocet vybaveni v db: {db.Vybavenis.Count()}");
-    return db.Vybavenis.ToList();
+    
+    List<VybaveniVm> vyblist = new List<VybaveniVm>();
+    var vyb = db.Vybavenis.ToList();
+    var rev = db.Revizes.ToList();
 
+    foreach(var o in vyb)
+    {
+        VybaveniVm? en = db.Vybavenis.SingleOrDefault(x => x.Id == o.Id).Adapt<VybaveniVm>();
+        var vybRev = rev.Where(r => r.VybaveniId == en.Id).ToList().OrderByDescending(x => x.DateTime);
+        if (vybRev.Any())
+        {
+            en.LastRevisionDateTime = vybRev.First().DateTime;
+        }
+        else
+        {
+            en.LastRevisionDateTime = en.BoughtDateTime;
+        }
+        vyblist.Add(en);
+    }
+    return vyblist;
 });
 
-//vrátí vybavení podle Id
-app.MapGet("/vybaveni_nemocnice/{Id}", (Guid Id, PptDbContext db) =>
+app.MapGet("/revize/{Id}", (Guid Id, PptDbContext db) =>
 {
-    Vybaveni? item = db.Vybavenis.ToList().SingleOrDefault(x => x.Id == Id);
-    var en = item.Adapt<VybaveniRevizeVm>();
+    var rev = db.Revizes.ToList().Where(x => x.Id == Id);
+
+    return rev;
+});
+
+//vrátí detail vybavení podle Id
+app.MapGet("/vybaveni_nemocnice/{Id}", (Guid vId, PptDbContext db) =>
+{
+    Vybaveni? item = db.Vybavenis
+    .Include(x => x.Revizes)
+    .Include(x => x.Ukons)
+    .SingleOrDefault(x => x.Id == vId);
+    var en = item?.Adapt<VybaveniRevizeVm>();
+    db.SaveChanges();
     return en;
 
 });
@@ -90,7 +127,7 @@ app.MapDelete("/vybaveni_nemocnice/{Id}", (Guid Id, PptDbContext db) =>
 });
 
 //Upraví=PUT vybavení v listu (podle Id)*
-app.MapPut("/vybaveni_nemocnice/{Id}", (Guid Id, VybaveniVm vyb, PptDbContext db) =>
+app.MapPut("/vybaveni_nemocnice/{Id}", (Guid Id, Vybaveni vyb, PptDbContext db) =>
 {
     var item = db.Vybavenis.SingleOrDefault(x => x.Id == Id);
     if(item == null)
@@ -106,7 +143,7 @@ app.MapPut("/vybaveni_nemocnice/{Id}", (Guid Id, VybaveniVm vyb, PptDbContext db
     }
 });
 
-//revize vybavení - PUT*
+//revize vybavení - POST*
 app.MapPost("/revize/{Id}", (Guid Id, PptDbContext db) =>
 {
     Vybaveni? vyb = db.Vybavenis.SingleOrDefault(x => x.Id == Id);
@@ -117,11 +154,13 @@ app.MapPost("/revize/{Id}", (Guid Id, PptDbContext db) =>
     rev.VybaveniId = vyb.Id;
     rev.Vybaveni = vyb;
     rev.DateTime = DateTime.Today;
-    db.Revizes.Add(rev);
+   
     db.Vybavenis.SingleOrDefault(r => r.Id == rev.VybaveniId)?.Revizes.Add(rev);
+    db.SaveChanges();
 });
 
 using var appContext = app.Services.CreateScope().ServiceProvider.GetRequiredService<PptDbContext>();
+
 try
 {
     appContext.Database.Migrate();
