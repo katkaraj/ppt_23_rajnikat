@@ -68,17 +68,15 @@
     [Parameter] public Guid Id { get; set; }
     VybaveniVm? vybaveni;
     VybaveniRevizeVm? VybRev;
-    VybaveniUkonVm? VybUk;
 
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(100);
-        VybRev = await Http.GetFromJsonAsync<VybaveniRevizeVm>($"vybaveni_nemocnice/{Id}");
+
+
         List<VybaveniVm>? vybaveniVm = await Http.GetFromJsonAsync<List<VybaveniVm>>("/vybaveni_nemocnice");
-       
+        VybRev = await Http.GetFromJsonAsync<VybaveniRevizeVm>($"vybaveni_nemocnice/{Id}");
         vybaveni = vybaveniVm?.SingleOrDefault(x => x.Id == VybRev?.Id);
-        var odpoved = Http.PutAsJsonAsync($"vybaveni_nemocnice/{vybaveni.Id}", vybaveni);
 
     }
-
 }

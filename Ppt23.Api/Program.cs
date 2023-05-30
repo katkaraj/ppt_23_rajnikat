@@ -14,7 +14,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<SeedingData>();
 
 var corsAllowedOrigin = builder.Configuration.GetSection("CorsAllowedOrigins").Get<string[]>();
 ArgumentNullException.ThrowIfNull(corsAllowedOrigin);
@@ -29,7 +28,7 @@ string? sqliteDbPath = builder.Configuration[nameof(sqliteDbPath)];
 ArgumentNullException.ThrowIfNull(sqliteDbPath);
 //if(string.IsNullOrEmpty(sqliteDbPath)) { throw new ArgumentException(nameof(sqliteDbPath)); }
 builder.Services.AddDbContext<PptDbContext>(opt => opt.UseSqlite($"FileName={sqliteDbPath}"));
-
+builder.Services.AddScoped<SeedingData>();
 var app = builder.Build();
 
 //app.Services.CreateScope().ServiceProvider
@@ -57,7 +56,7 @@ app.MapGet("/revize/{nazdar}", (string nazdar, PptDbContext db) =>
     var list = db.Revizes.ToList();
     var filtrRevize = list.Where(x => x.Name.Contains(nazdar)).Adapt<List<RevizeViewModel>>();
     db.SaveChanges();
-    return Results.Ok();
+    return Results.Ok(filtrRevize);
 });
 
 //Vrátí seznam vybavení
