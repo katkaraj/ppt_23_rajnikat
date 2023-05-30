@@ -19,6 +19,7 @@ namespace Ppt23.Api.Data
 
         public List<Revize> Revizes { get; set; } = new();
         public List<Ukon> Ukons { get; set; } = new();
+        public List<Pracovnik> Pracovniks { get; set; } = new();
 
         public void pridejRevizis(PptDbContext db)
         {
@@ -65,6 +66,27 @@ namespace Ppt23.Api.Data
             }
 
         }
+
+        public void pridejPracovniks(PptDbContext db)
+        {
+            Random rnd = new Random();
+            string[] jobs = { "RA asistent", "Lékař", "Sestra" };
+            for(int k=0; k<2; k++)
+            {
+                Pracovnik pracovnik = new Pracovnik()
+                {
+                    Id = Guid.Empty,
+                    Name = RandomString(10),
+                    Job = jobs[rnd.Next(jobs.Length)],
+                };
+
+                Pracovniks.Add(pracovnik);
+                db.Pracovniks.Add(pracovnik);
+            }
+        }
+
+        public string RandomString(int length) =>
+           new(Enumerable.Range(0, length).Select(_ => (char)Random.Shared.Next('a', 'z')).ToArray());
     }
 
 }

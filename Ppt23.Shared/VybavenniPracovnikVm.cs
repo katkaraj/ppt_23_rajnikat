@@ -8,12 +8,11 @@ using System.Threading.Tasks;
 
 namespace Ppt23.Shared;
 
-public class VybaveniUkonVm
+public class VybaveniPracovnikVm
 {
     public Guid Id { get; set; }
-
-    public Guid UkonId { get; set; }
-    public string Name { get; set; } = null!;
-    public DateTime Date { get; set; }
-    public VybaveniPracovnikVm pracovnik { get; set; } = null!;
+    public string Name { get; set; } = String.Empty;
+    public string Job { get; set; } = String.Empty;
+    public VybaveniUkonVm ukon { get; set; } = null!;
+    
 }

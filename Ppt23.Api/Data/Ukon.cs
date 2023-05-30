@@ -14,6 +14,7 @@ public class Ukon
     public Guid VybaveniId { get; set; }
     public Vybaveni vybaveni { get; set; } = null!;
     public DateTime DateTime { get; set; }
+    public Pracovnik pracovnik { get; set; } = null!;
 
     public void randDate(VybaveniVm vyb, DateTime startDate, DateTime endDate)
     {

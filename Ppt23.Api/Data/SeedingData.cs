@@ -23,11 +23,11 @@ namespace Ppt23.Api.Data
                     
                     en.pridejRevizis(db);
                     en.pridejUkons(db);
+                    en.pridejPracovniks(db);
                     db.Vybavenis.Add(en);
                     
                 }
             }
-
             await db.SaveChangesAsync();
         }
     }

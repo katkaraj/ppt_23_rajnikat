@@ -24,7 +24,7 @@ policy.WithOrigins(corsAllowedOrigin)
 .AllowAnyHeader()));
 
 
-string? sqliteDbPath = builder.Configuration[nameof(sqliteDbPath)];
+string? sqliteDbPath = builder.Configuration.GetValue<string>("sqliteDbPath");
 ArgumentNullException.ThrowIfNull(sqliteDbPath);
 //if(string.IsNullOrEmpty(sqliteDbPath)) { throw new ArgumentException(nameof(sqliteDbPath)); }
 builder.Services.AddDbContext<PptDbContext>(opt => opt.UseSqlite($"FileName={sqliteDbPath}"));
@@ -97,10 +97,10 @@ app.MapGet("/vybaveni_nemocnice/{Id}", (Guid vId, PptDbContext db) =>
     Vybaveni? item = db.Vybavenis
     .Include(x => x.Revizes)
     .Include(x => x.Ukons)
+    .ThenInclude(x => x.pracovnik)
     .SingleOrDefault(x => x.Id == vId);
     var en = item?.Adapt<VybaveniRevizeVm>();
-    db.SaveChanges();
-    return en;
+    return Results.Ok(en);
 
 });
 

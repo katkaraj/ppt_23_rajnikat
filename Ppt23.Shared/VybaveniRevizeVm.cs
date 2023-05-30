@@ -17,4 +17,5 @@ public class VybaveniRevizeVm
 
     public List<RevizeViewModel> Revizes { get; set; } = new List<RevizeViewModel>();
     public List<VybaveniUkonVm> Ukons { get; set; } = new List<VybaveniUkonVm>();
+    public List<VybaveniPracovnikVm> Pracovniks { get; set; } = new List<VybaveniPracovnikVm>();
 }

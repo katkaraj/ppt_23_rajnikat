@@ -35,30 +35,57 @@
 
         <div>Seznam revizí</div>
         <div> </div>
-            @foreach (var o in VybRev.Revizes)
-            {
-                <div>Id:</div>
-                <div>@o.Id</div>
+        @foreach (var o in VybRev.Revizes)
+        {
 
-                <div>Název:</div>
-                <div>@o.Nazev</div>
+            <div>Id:</div>
+            <div>@o.Id</div>
 
-                <div>Datum:</div>
-                <div>@o.DateTime</div>
-            }
+            <div>Název:</div>
+            <div>@o.Nazev</div>
+
+            <div>Datum:</div>
+            <div>@o.DateTime</div>
+        }
 
         <div>Seznam úkonů</div>
         <div> </div>
-           @foreach (var o in VybRev.Ukons)
+        @foreach (var o in VybRev.Ukons)
+        {
+            @if (o.pracovnik is not null)
             {
                 <div>Id:</div>
-                <div>@o.Id</div>
+                <div class="text-green-500">@o.Id</div>
+}
+            else
+             {
+                 <div>Id:</div>
+                 <div>@o.Id</div>
+             }
 
-                <div>Název:</div>
+
+            <div>Název:</div>
+            <div>@o.Name</div>
+
+            <div>Datum:</div>
+            <div>@o.Date</div>
+        }
+
+            <div>Seznam pracovníků</div>
+            <div> </div>
+
+        @if (VybRev.Pracovniks is not null)
+        {
+            @foreach (var o in VybRev.Pracovniks)
+            {
+                <div>Provedl:</div>
                 <div>@o.Name</div>
-
-                <div>Datum:</div>
-                <div>@o.Date</div>
+            }
+        }
+        else
+            {
+                <div>Žádný pracovník</div>
+                <div></div>
             }
     </div>
 </body>
@@ -72,7 +99,6 @@
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(100);
-
 
         List<VybaveniVm>? vybaveniVm = await Http.GetFromJsonAsync<List<VybaveniVm>>("/vybaveni_nemocnice");
         VybRev = await Http.GetFromJsonAsync<VybaveniRevizeVm>($"vybaveni_nemocnice/{Id}");
